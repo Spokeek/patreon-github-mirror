@@ -1,0 +1,20 @@
+{
+  "name": "patreon-github-mirror",
+  "version": "1.0.0",
+  "description": "Patreon mirror on Github (mostly used for VRChat string load)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "patreon",
+    "git",
+    "mirror"
+  ],
+  "author": "Spokeek",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
