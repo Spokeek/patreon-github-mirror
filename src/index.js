@@ -1,50 +1,29 @@
+const logger = require('./logger')
+const config = require('./config')
+const patreonHooks = require('./patreon-hooks')
+
 const express = require('express')
 var bodyParser = require('body-parser')
+const { expressErrorHandler, HTTPError } = require('./errors')
+
 const app = express()
-const port = process.env.PORT || 3000
-app.use(bodyParser.urlencoded({ extended: false }))
-const crypto = require('crypto')
-const hooks = require('./patreonHooks')
-
-const secret = process.env.PATREON_SECRET;
-if(!secret){
-  console.warn("DANGER, no secret defined, there will be no signature check!")
-}
-
 app.use(bodyParser.json())
-app.post('/patreon-hook', (req, res) => {
-  const signature = req.headers['x-patreon-signature']
+app.use(bodyParser.urlencoded({ extended: false }))
 
-  if(secret){
-    const contentHash = crypto.createHmac('md5', secret)
-      .update(req.body)
-      .digest('hex');
+app.post(patreonHooks.ROUTE, (req, res) => {
+  const signature = req.headers[patreonHooks.SIGNATURE_HEADER]
+  const event = req.headers[patreonHooks.EVENT_HEADER]
 
-    if(contentHash !== signature){
-      res.sendStatus(403, 'Signature mismatch')
-      return
-    }
+  patreonHooks.handlePatronHook(signature, event, req.body)
+
+  res.send('Patreon hook processed')
   }
-    
-  const event = req.headers['x-patreon-event']
-  
-  switch(event){
-    case "pledges:create":
-      hooks.onPledgeCreate(req.body)
-      break
-    case "pledges:update":
-      hooks.onPledgeUpdate(req.body)
-      break
-    case "pledges:delete":
-      hooks.onPledgeDelete(req.body)
-      break
-    default:
-      res.sendStatus(400, 'Unknown hook type / Unhandled hook type')
-      return
-  }
-  res.send('Patron hook received!')
+)
+
+app.use(expressErrorHandler)
+
+
+app.listen(config.get('application.port'), () => {
+  logger.info(`App app listening on port ${config.get('application.port')}`)
 })
 
-app.listen(port, () => {
-  console.log(`App app listening on port ${port}`)
-})

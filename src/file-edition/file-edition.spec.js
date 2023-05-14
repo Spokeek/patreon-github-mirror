@@ -1,14 +1,5 @@
-const {updateListFile, parsePayload} = require('./helpers.js')
+const {updateListFile} = require('./file-edition.js')
 const fs = require('fs')
-
-test('Testing payload parse', () => {
-    const data = require('./_mocks/data.json')
-    const result = parsePayload(data)
-    expect(result.patreonCampainId).toBe("9375935")
-    expect(result.patreonUserId).toBe("80815623")
-    expect(result.patreonRewardId).toBe("9158828")
-    expect(result.patreonUserName).toBe("UserName")
-});
 
 test('File edition', () => {
     const path = require('path').resolve(__dirname, './_mocks/list.txt')

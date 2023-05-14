@@ -130,4 +130,5 @@ dist
 .pnp.*
 
 # Custom
-src/
+src/**/_mocks
+config/*.json
